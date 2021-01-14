@@ -11,20 +11,22 @@ let 제목 = styled.h4`
   font-size : 25px;
   color : ${ props => props.색상 }
 `;
-//
+
 
 function Detail(props){
  
-  // useEffect는 컴포넌트가 mount 됐을 때, 컴포넌트가 update될 때 
-  // 특정 코드를 실행할 수 있음
+  const [alert, setAlert] = useState(true);
+  //true 일 때만 원하는 코드 보이게 하기 위한 상태 저장
+
     useEffect(()=>{
-     let 타이머 = setTimeout(()=>{},2000); //setTimeout은 이런식으로 변수에 저장해서 주로 씀
-      //return function 어쩌구() { 실행할 코드 } //unmount 될 때 실행됨
-    })
+     let 타이머 = setTimeout(()=>{setAlert(false)},2000); 
+     return ()=>{ clearTimeout(타이머)} //컴포넌트가 사라질 때 타이머 해제시켜서 버그 방지
+    }, [alert]) //alert라는 state가 update 될 때만 실행해달라는 조건을 붙임.
+    //이런 조건을 붙이지 않으면 해당 컴포넌트가 update 될 때마다 계속 재렌더링되어 실행됨.
+    //빈 대괄호만 적고 대괄호 안에 아무것도 넣지 않으면 컴포넌트가 동작할 때 딱 한 번만 실행되고
+    //다시는 실행되지 않음.
 
     let {id} = useParams();
- 
-    //history라는 방문기록이 다 담기는 object
     let history = useHistory();
     let prd = props.shoes.find(x=>x.id == id);
 
@@ -33,9 +35,14 @@ function Detail(props){
             <박스>
               <제목 className="red">Detail</제목>
             </박스>
-            <div className="my-alert">
+          
+          {/*삼항연산자로 true일 경우 코드를 넣어주고 아닐경우 null을 넣어줌*/}
+            {
+              alert === true ? (  <div className="my-alert">
               <p>재고가 얼마 남지 않았습니다</p>
-            </div>
+            </div>) : null
+            }
+
             <div className="row">
               <div className="col-md-6">
                 <img
