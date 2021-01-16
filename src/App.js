@@ -6,6 +6,8 @@ import { Route, Link, Switch } from "react-router-dom";
 import Detail from './Detail';
 import axios from 'axios';
 
+import Cart from './Cart.js';
+
 //1. context 만들기 (React.createContext()로 범위생성, 이 범위의 이름은 재고context) 다른 파일에서 쓰려면 이 범위를 export할 수 있고 이걸 쓰려는 다른 파일에서
 //import {재고context} from './App.js'; 이렇게 import해서 쓸 수 있음
 export let 재고context = React.createContext();
@@ -102,9 +104,14 @@ function App() {
 
       </Route>
 
-      <Route path="/:id"> 
+      {/* <Route path="/:id"> 
         <div>/뒤에 아무거나 적으면 이거 보여줘라</div>
+      </Route> */}
+
+      <Route path="/cart">
+        <Cart></Cart>
       </Route>
+
     </Switch>    
 
       
