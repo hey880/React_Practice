@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import './Detail.scss';
 import {재고context} from './App.js';
 import {Nav} from 'react-bootstrap';
+import {connect} from 'react-redux';
 
 import { CSSTransition } from "react-transition-group";
 
@@ -33,7 +34,7 @@ function Detail(props){
 
     let {id} = useParams();
     let history = useHistory();
-    let prd = props.shoes.find(x=>x.id == id);
+    let 찾은상품 = props.shoes.find(x=>x.id == id);
 
     return (
       <div className="container">
@@ -55,9 +56,9 @@ function Detail(props){
             />
           </div>
           <div className="col-md-6 mt-4">
-            <h4 className="pt-5">{prd.title}</h4>
-            <p>{prd.content}</p>
-            <p>{prd.price}원</p>
+            <h4 className="pt-5">{찾은상품.title}</h4>
+            <p>{찾은상품.content}</p>
+            <p>{찾은상품.price}원</p>
             <div>
               {" "}
               <Info 재고={props.재고}></Info>{" "}
@@ -66,10 +67,13 @@ function Detail(props){
               className="btn btn-danger"
               onClick={() => {
                 props.재고변경([9, 10, 11]);
+                //하드코딩이 아니라 실제 실어보낼 값을 넣어보자
+                props.dispatch({type : '항목추가', 데이터 : {id:찾은상품.id, name:찾은상품.title, quan: 1}});
+                //페이지 이동되면서 새로고침 일어나서 값 초기화 되는 걸 막기위해
+                //history.push로 새로고침 없이 페이지 이동되게 함
+                history.push('/cart');
               }}
-            >
-              주문하기
-            </button>
+            >주문하기</button>
             <button
               className="btn btn-danger"
               onClick={() => {
@@ -81,14 +85,10 @@ function Detail(props){
             </button>
           </div>
         </div>
-        {/*mt-5 는 margin-top:5, bootstrap이 제공하는 기본 class*/}
-        {/*defaultActiveKey는 어떤 걸 누른 것처럼 실행해달라고 기본으로 정해
-        두는 값*/}
+ 
         <Nav className="mt-5" variant="tabs" defaultActiveKey="link-0">
           <Nav.Item>
-            {/*버튼들 마다 유니크한 eventKey 부여하기, 스위치 누르면 애니메이션
-            동작 안되게 false 되게 해둠. 아래 컴포넌트에서 useEffect로 컴포넌트 로드시
-            동작하게 true로 바꿔주고.*/}
+            
             <Nav.Link eventKey="link-0" onClick={()=>{스위치변경(false); 누른탭변경(0)}}>Active</Nav.Link>
           </Nav.Item>
           <Nav.Item>
@@ -105,7 +105,6 @@ function Detail(props){
 }
 //평소에는 false로(안 움직이게) 해놨다가 컴포넌트 업데이트, 로드시에만 움직이게
 function TabContent(props){
-  //if문을 구현하려면 컴포넌트를 하나 만들어야함.
   useEffect(()=>{
     props.스위치변경(true);
   })
@@ -125,4 +124,11 @@ function Info(props){
   )
 }
 
-export default Detail;
+function state를props화(state){
+  return{
+    state: state.reducer,
+    alert열렸니 : state.reducer2
+  }
+}
+
+export default connect(state를props화)(Detail);

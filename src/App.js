@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, lazy, Suspense } from "react";
 import { Navbar, Nav, NavDropdown, Button, Jumbotron } from "react-bootstrap";
 import "./App.css";
 import Data from "./data.js";
-import { Route, Link, Switch } from "react-router-dom";
-import Detail from './Detail';
+import { Route, Link, Switch, useHistory} from "react-router-dom";
+//import Detail from './Detail';
 import axios from 'axios';
 
 import Cart from './Cart.js';
 
-//1. context 만들기 (React.createContext()로 범위생성, 이 범위의 이름은 재고context) 다른 파일에서 쓰려면 이 범위를 export할 수 있고 이걸 쓰려는 다른 파일에서
-//import {재고context} from './App.js'; 이렇게 import해서 쓸 수 있음
+let Detail = lazy(()=> import ("./Detail.js"));
+
+
 export let 재고context = React.createContext();
 
 function App() {
@@ -26,7 +27,7 @@ function App() {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="ml-auto">
             <Nav.Link as={Link} to="/">
-              {/* Nav.Link를 Link처럼 사용해달라는 의미 */}
+        
               Home
             </Nav.Link>
             <Nav.Link as={Link} to="/detail">
@@ -69,7 +70,6 @@ function App() {
 
           <div className="container">
 
-            {/* //2. 같은 값을 공유할 HTML들을 <범위.Provider>로 싸매기. value={공유하고 싶은 값}을 적음 */}
             <재고context.Provider value={재고}>
 
             <div className="row">
@@ -99,14 +99,12 @@ function App() {
       <Route path="/detail/:id">
 
         <재고context.Provider value={재고}>
-        <Detail shoes={shoes} 재고={재고} 재고변경={재고변경}/>
+          <Suspense fallback={<div>로딩중입니다.</div>}>
+            <Detail shoes={shoes} 재고={재고} 재고변경={재고변경}/>
+          </Suspense>
         </재고context.Provider>
 
       </Route>
-
-      {/* <Route path="/:id"> 
-        <div>/뒤에 아무거나 적으면 이거 보여줘라</div>
-      </Route> */}
 
       <Route path="/cart">
         <Cart></Cart>
@@ -119,14 +117,13 @@ function App() {
   );
 }
 
-//3. 얘는 이제 공유된 재고라는 state를 마음대로 갖다 쓸 수 있음
 function Card(props) {
-
+  
   let 재고 = useContext(재고context);
-  //useContext(범위이름)로 공유된 값 사용 가능
-
+  let history = useHistory();
+  //onClick은 <컴포넌트 /> 여기에 달기보다는 이 컴포넌트 함수를 찾아가서 그 함수의 return 값 내의 최상위 div에 달아준다.
   return (
-    <div className="col-md-4">
+    <div className="col-md-4" onClick={()=>{history.push('/detail/'+props.shoes.id)}}>
       <img
         src={`https://codingapple1.github.io/shop/shoes${props.i + 1}.jpg`}
         width="100%"
